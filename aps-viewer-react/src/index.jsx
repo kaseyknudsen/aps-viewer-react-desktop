@@ -1,6 +1,7 @@
 // import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./components/App";
+import 'bootstrap/dist/css/bootstrap.css';
 
 const APS_ACCESS_TOKEN =
  // Specify your access token
