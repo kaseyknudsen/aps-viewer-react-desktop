@@ -1,49 +1,41 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import Viewer from './Viewer';
 import './App.css';
 
-class App extends React.Component {
-    constructor(props) {
-        super(props);
-        this.wrapper = null;
-        this.state = {
-            camera: null,
-            selectedIds: []
-        };
-    }
+const App = (props) => {
+    const [camera, setCamera] = useState(null);
+    const [selectedIds, setSelectedIds] = useState([]);
+    const wrapperRef = useRef(null);
 
-    onInputChange = (ev) => {
+    const onInputChange = (ev) => {
         const val = ev.target.value.trim();
         const ids = val.split(',').filter(e => e.length > 0).map(e => parseInt(e)).filter(e => Number.isInteger(e));
-        this.setState({ selectedIds: ids });
-    }
+        setSelectedIds(ids);
+    };
 
-    render() {
-        const { token, urn } = this.props;
-        return (
-            <div className="app">
-                <div style={{ position: 'relative', width: '800px', height: '600px' }}>
-                    <Viewer
-                        runtime={{ accessToken: token }}
-                        urn={urn}
-                        selectedIds={this.state.selectedIds}
-                        onCameraChange={({ viewer, camera }) => this.setState({ camera: camera.getWorldPosition() })}
-                        onSelectionChange={({ viewer, ids }) => this.setState({ selectedIds: ids })}
-                        ref={ref => this.wrapper = ref}
-                    />
-                </div>
-                <div>
-                    Camera Position:
-                    {this.state.camera && `${this.state.camera.x.toFixed(2)} ${this.state.camera.y.toFixed(2)} ${this.state.camera.z.toFixed(2)}`}
-                </div>
-                <div>
-                    Selected IDs:
-                    <input type="text" value={this.state.selectedIds.join(',')} onChange={this.onInputChange}></input>
-                </div>
-                <button onClick={() => this.wrapper.viewer.autocam.goHome()}>Reset View</button>
+    return (
+        <div className="app">
+            <div style={{ position: 'relative', width: '800px', height: '600px' }}>
+                <Viewer
+                    runtime={{ accessToken: props.token }}
+                    urn={props.urn}
+                    selectedIds={selectedIds}
+                    onCameraChange={({ viewer, camera }) => setCamera(camera.getWorldPosition())}
+                    onSelectionChange={({ viewer, ids }) => setSelectedIds(ids)}
+                    ref={wrapperRef}
+                />
             </div>
-        );
-    }
-}
+            <div>
+                Camera Position:
+                {camera && `${camera.x.toFixed(2)} ${camera.y.toFixed(2)} ${camera.z.toFixed(2)}`}
+            </div>
+            <div>
+                Selected IDs:
+                <input type="text" value={selectedIds.join(',')} onChange={onInputChange} />
+            </div>
+            <button onClick={() => wrapperRef.current.viewer.autocam.goHome()}>Reset View</button>
+        </div>
+    );
+};
 
 export default App;
